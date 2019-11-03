@@ -22,10 +22,10 @@ function _init()
   palt(3, true)  
   caret.x = 0
   caret.y = 0
-  board.x = 10
+  board.x = 6
   board.y = 10
   board.cells = {}
-  numberOfMines = 10
+  numberOfMines = 8
   zoomFactor = 1
   for i = 0, board.x - 1 do
     board.cells[i] = {}
@@ -245,7 +245,7 @@ function getSurroundingCells(x,y)
   return surrounding
 end
 
-function _update60()
+function _update()
   _checkButtons(caret, board.x, board.y)
   if (board.x * 8 * zoomFactor > 127) then 
     moveCamera(caret.x, caret.y)
@@ -256,8 +256,10 @@ function _update60()
 end
 
 function centerCamera() 
-  camerax = ((board.x*8*zoomFactor) - 127 / 2) - board.x*8*zoomFactor/2
-  camera(flr(camerax), flr(camerax))
+  cx = ((board.x*8*zoomFactor) - 127 / 2) - board.x*8*zoomFactor/2
+  cy = ((board.y*8*zoomFactor) - 127 / 2) - board.y*8*zoomFactor/2
+
+  camera(flr(cx), flr(cy))
 end
 
 function moveCamera()
