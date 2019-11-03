@@ -161,6 +161,13 @@ function openCell(x, y)
   end
 end
 
+function checkGameOver() 
+  flaggedCount = countFlags(true)
+  if (flaggedCount == numberOfMines) then
+    finished = true
+  end
+end
+
 function revealMines()
   for row = 0, board.x - 1 do
     for column = 0, board.y - 1 do
@@ -245,7 +252,7 @@ function _update60()
   else
     centerCamera()
   end
-
+  checkGameOver()
 end
 
 function centerCamera() 
