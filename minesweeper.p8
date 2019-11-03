@@ -19,6 +19,7 @@ zoomFactor = 1
 message = ""
 finished = false
 finishedZoomOut = true
+setup = false
 
 function _init()
   palt(0, false)
@@ -34,20 +35,19 @@ function _init()
         board.cells[i][j].surroundingMines = 0
     end
   end
-
-  _setupMines()
-  _calculateMines()
 end
 
 -- Randomly distribute the requested number of mines
 -- around the game board
-function _setupMines() 
+function _setupMines(fx, fy) 
   placedMines = 0
 
   while (placedMines < numberOfMines) do
     x = flr(rnd(board.x))
     y = flr(rnd(board.y))
-    if (board.cells[x][y].type != MINE) then
+    -- make sure first click is free
+
+    if (board.cells[x][y].type != MINE and (x < fx - 1 or x > fx + 1 or y < fy - 1 or y > fy + 1)) then
       board.cells[x][y].type = MINE
       placedMines += 1
     end
@@ -109,6 +109,11 @@ function countFlags(minesOnly)
 end
 
 function openCell(x, y) 
+  if (not setup) then 
+    _setupMines(x,y)
+    _calculateMines()
+    setup = true
+  end
   cell = board.cells[x][y]
   printh("Open cell "..tostr(x)..","..tostr(y))
   -- Force open cells
