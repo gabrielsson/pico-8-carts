@@ -6,7 +6,7 @@ black,dark_blue,dark_purple,dark_green,brown,dark_gray,light_gray,white,red,oran
 MINE, EMPTY, FLAGGED, FLAGGED_MINE=0,1,2,3
 SPRITE_CLOSED, SPRITE_CARET, SPRITE_BOMB, SPRITE_NUMBER, SPRITE_OPEN, SPRITE_FLAG = 1,2,3,4,16,17
 OPEN,CLOSED = 0,1
-
+STATE_SETUP, STATE_GAME, STATE_END = 0,1,2
 board = {}
 
 numberOfMines = 0
@@ -16,8 +16,10 @@ message = ""
 finished = false
 finishedZoomOut = true
 setup = false
-
+game = {}
 function _init()
+  game.update = updateGame
+  game.draw = drawGame
   palt(0, false)
   palt(3, true)  
   caret.x = 0
@@ -40,6 +42,44 @@ function _init()
   end
 end
 
+function _update()
+  game.update()
+end
+
+function updateGame()
+  _checkButtons(caret, board.x, board.y)
+  if (board.x * 8 * zoomFactor > 127) then 
+    moveCamera(caret.x, caret.y)
+  else
+    centerCamera()
+  end
+  checkGameOver()
+end
+
+function _draw()
+  game.draw()
+end
+
+function drawGame()
+  cls()
+  width = 8
+  _drawGameBoard()
+  if (finished) then 
+    centerCamera()
+    if (finishedZoomOut) then 
+      zoomFactor = zoomFactor * 0.995
+      if (zoomFactor < 0.5) finishedZoomOut = false
+    else 
+      zoomFactor = zoomFactor * 1.005
+      if(zoomFactor > 3) finishedZoomOut = true
+    end
+    camera(0,0)
+    outline("PRESS ❎ TO CONTINUE", 25, 60, black, white)
+    centerCamera()
+  else
+    _drawCaret(caret.x, caret.y)
+  end
+end
 -- Randomly distribute the requested number of mines
 -- around the game board leaving fx, fy free of mine
 -- and number
@@ -251,16 +291,6 @@ function getSurroundingCells(x,y)
   return surrounding
 end
 
-function _update()
-  _checkButtons(caret, board.x, board.y)
-  if (board.x * 8 * zoomFactor > 127) then 
-    moveCamera(caret.x, caret.y)
-  else
-    centerCamera()
-  end
-  checkGameOver()
-end
-
 function centerCamera() 
   cx = ((board.x*8*zoomFactor) - 127 / 2) - board.x*8*zoomFactor/2
   cy = ((board.y*8*zoomFactor) - 127 / 2) - board.y*8*zoomFactor/2
@@ -290,27 +320,7 @@ function moveCamera()
   camera(currentCameraX, currentCameraY)
 end
 
-function _draw()
-  
-  cls()
-  width = 8
-  _drawGameBoard()
-  if (finished) then 
-    centerCamera()
-    if (finishedZoomOut) then 
-      zoomFactor = zoomFactor * 0.995
-      if (zoomFactor < 0.5) finishedZoomOut = false
-    else 
-      zoomFactor = zoomFactor * 1.005
-      if(zoomFactor > 3) finishedZoomOut = true
-    end
-    camera(0,0)
-    outline("PRESS ❎ TO CONTINUE", 25, 60, black, white)
-    centerCamera()
-  else
-    _drawCaret(caret.x, caret.y)
-  end
-end
+
 
 function outline(s,x,y,c1,c2)
 	for i=0,2 do
