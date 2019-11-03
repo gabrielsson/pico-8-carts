@@ -9,7 +9,7 @@ OPEN,CLOSED = 0,1
 
 board = {}
 
-numberOfMines = 3
+numberOfMines = 0
 caret = {}
 zoomFactor = 1
 message = ""
@@ -22,9 +22,10 @@ function _init()
   palt(3, true)  
   caret.x = 0
   caret.y = 0
-  board.x = 4
-  board.y = 4
+  board.x = 10
+  board.y = 10
   board.cells = {}
+  numberOfMines = 10
   zoomFactor = 1
   for i = 0, board.x - 1 do
     board.cells[i] = {}
