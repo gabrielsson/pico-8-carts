@@ -77,7 +77,6 @@ function markMine(x, y)
   counted = countFlags(false)
   printh("Counted flags "..tostr(counted))
 
-  
   if (cell.type == FLAGGED) then
       cell.type = EMPTY
   elseif (cell.type == FLAGGED_MINE) then
@@ -87,7 +86,6 @@ function markMine(x, y)
   elseif (cell.type == MINE) then
       cell.type = FLAGGED_MINE
       printh("Setting flagged_mine "..tostr(cell.type))
-
   else
       cell.type = FLAGGED
       printh("Setting flagged "..tostr(cell.type))
@@ -291,7 +289,7 @@ function _draw()
       if(zoomFactor > 3) finishedZoomOut = true
     end
     camera(0,0)
-    outline("PRESS X TO CONTINUE", 25, 60, black, white)
+    outline("PRESS ❎ TO CONTINUE", 25, 60, black, white)
     centerCamera()
   else
     _drawCaret(caret.x, caret.y)
