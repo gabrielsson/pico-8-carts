@@ -18,17 +18,23 @@ finishedZoomOut = true
 setup = false
 game = {}
 function _init()
-  game.update = updateGame
-  game.draw = drawGame
+  game.update = updateSetup
+  game.draw = drawSetup
+  zoomFactor = 1
+  board.x = 10
+  board.y = 10
+  numberOfMines = 10
+  setup = false
+
+  camera(0,0)
+end
+function initGame() 
   palt(0, false)
   palt(3, true)  
   caret.x = 0
   caret.y = 0
-  board.x = 10
-  board.y = 10
+
   board.cells = {}
-  numberOfMines = 10
-  zoomFactor = 1
   for i = 0, board.x - 1 do
     board.cells[i] = {}
     for j = 0, board.y - 1 do
@@ -41,44 +47,106 @@ function _init()
     end
   end
 end
-
 function _update()
   game.update()
 end
 
+function updateSetup()
+  if(not game.setup) then 
+    game.setup = {}
+    game.setup.state = 0
+  end
+  checkSetupButtons()
+end
+
+function checkSetupButtons() 
+  if (btnp(fire1)) then 
+    initGame()
+    game.update = updateGame
+    game.draw = drawGame
+  end
+  if (btnp(down) and game.setup.state < 3) then 
+    game.setup.state += 1
+  end
+
+  if (btnp(up) and game.setup.state > 0) then 
+    game.setup.state -= 1
+  end
+
+  if (btnp(left)) then
+    if(game.setup.state == 0 and board.x > 4) board.x -= 1
+    if(game.setup.state == 1 and board.y > 4) board.y -= 1
+    if(game.setup.state == 2 and zoomFactor > 0.5) zoomFactor -= 0.5
+    if(game.setup.state == 3 and numberOfMines > 0) numberOfMines -= 1
+
+  end
+
+  if (btnp(right)) then
+    if(game.setup.state == 0 and board.x < 25) board.x += 1
+    if(game.setup.state == 1 and board.y < 25) board.y += 1
+    if(game.setup.state == 2 and zoomFactor < 6) zoomFactor += 0.5
+    if(game.setup.state == 3 and numberOfMines < board.x*board.y - 9) numberOfMines += 1
+  end
+end
+
+function drawSetup()
+  cls()
+  outline("<                  >", 10, 20 * game.setup.state + 20, white, black)
+  outline("x: "..board.x, 30, 20, white, black)
+  outline("y: "..board.y, 30, 40, white, black)
+  outline("zoom: " ..zoomFactor.."x", 30, 60, white, black)
+  outline("mines: " ..numberOfMines, 30, 80, white, black)
+
+end
 function updateGame()
-  _checkButtons(caret, board.x, board.y)
-  if (board.x * 8 * zoomFactor > 127) then 
-    moveCamera(caret.x, caret.y)
-  else
+  checkGameButtons(caret, board.x, board.y)
+  checkGameOver()
+  gameWidth = board.x * 8 * zoomFactor
+  gameHeight = board.y * 8 * zoomFactor
+  if (gameWidth > 127 and gameHeight > 127) then 
+    moveCameraX(caret.x, caret.y)
+    moveCameraY(caret.x, caret.y)
+  elseif (board.y * 8 * zoomFactor > 127) then 
+    moveCameraY(caret.x, caret.y)
+    centerCameraX()
+
+  elseif (board.x * 8 * zoomFactor > 127) then 
+    moveCameraX(caret.x, caret.y)
+    centerCameraY()
+  else 
     centerCamera()
   end
-  checkGameOver()
 end
 
 function _draw()
   game.draw()
 end
 
+function drawEnd()
+  cls()
+  centerCamera()
+  _drawGameBoard()
+  if (finishedZoomOut) then 
+    zoomFactor = zoomFactor * 0.995
+    if (zoomFactor < 0.5) finishedZoomOut = false
+  else 
+    zoomFactor = zoomFactor * 1.005
+    if(zoomFactor > 3) finishedZoomOut = true
+  end
+  camera(0,0)
+  outline("PRESS ❎ TO CONTINUE", 25, 60, black, white)
+  centerCamera()
+end
+
+function updateEnd() 
+  checkEndButtons()
+end
+
 function drawGame()
   cls()
   width = 8
   _drawGameBoard()
-  if (finished) then 
-    centerCamera()
-    if (finishedZoomOut) then 
-      zoomFactor = zoomFactor * 0.995
-      if (zoomFactor < 0.5) finishedZoomOut = false
-    else 
-      zoomFactor = zoomFactor * 1.005
-      if(zoomFactor > 3) finishedZoomOut = true
-    end
-    camera(0,0)
-    outline("PRESS ❎ TO CONTINUE", 25, 60, black, white)
-    centerCamera()
-  else
-    _drawCaret(caret.x, caret.y)
-  end
+  _drawCaret(caret.x, caret.y)
 end
 -- Randomly distribute the requested number of mines
 -- around the game board leaving fx, fy free of mine
@@ -174,14 +242,11 @@ function openCell(x, y)
   -- Open cell up and check if its a mine
   cell.state = OPEN
   if (cell.type == MINE) then
-    -- end game
-    printh("GAME OVER")
+    
     revealMines()
-    finished = true
+    game.update = updateEnd
+    game.draw = drawEnd
     music(-1)
-    --showMessage()
-    --setup()
-
     return
   end
 
@@ -210,6 +275,7 @@ function checkGameOver()
   flaggedCount = countFlags(true)
   if (flaggedCount == numberOfMines) then
     finished = true
+    _init()
     music(-1)
   end
 end
@@ -298,21 +364,51 @@ function centerCamera()
   camera(flr(cx), flr(cy))
 end
 
-function moveCamera()
+function centerCameraX() 
+  cx = ((board.x*8*zoomFactor) - 127 / 2) - board.x*8*zoomFactor/2
+  cy = peek(0x5f2a)+peek(0x5f2b)*256
+
+  camera(flr(cx), cy)
+end
+
+function centerCameraY() 
+  cx = peek(0x5f28)+peek(0x5f29)*256
+  cy = ((board.y*8*zoomFactor) - 127 / 2) - board.y*8*zoomFactor/2
+
+  camera(cx, flr(cy))
+end
+
+function moveCameraY()
   currentCameraX=peek(0x5f28)+peek(0x5f29)*256
   currentCameraY=peek(0x5f2a)+peek(0x5f2b)*256
   screenWidth = 127
   cellWidth = 8 * zoomFactor
   -- calculate the new x,y
-  x = ((board.x*cellWidth - screenWidth) / (board.x -1) ) * caret.x
   y = ((board.y*cellWidth - screenWidth) / (board.y -1) ) * caret.y
+
+  -- smooth transition
+  if(y < currentCameraY) currentCameraY -=1
+  if(y > currentCameraY) currentCameraY +=1
+
+  -- setting the camera position with this call
+  -- (0,0) shows px from 0-127
+  -- (-127, -127) scrolls the camera so it shows 127-255
+  camera(currentCameraX, currentCameraY)
+end
+
+function moveCameraX()
+  currentCameraX=peek(0x5f28)+peek(0x5f29)*256
+  currentCameraY=peek(0x5f2a)+peek(0x5f2b)*256
+
+  screenWidth = 127
+  cellWidth = 8 * zoomFactor
+  -- calculate the new x,y
+  x = ((board.x*cellWidth - screenWidth) / (board.x -1) ) * caret.x
 
   
   -- smooth transition
   if(x < currentCameraX) currentCameraX -=1
   if(x > currentCameraX) currentCameraX +=1
-  if(y < currentCameraY) currentCameraY -=1
-  if(y > currentCameraY) currentCameraY +=1
 
   -- setting the camera position with this call
   -- (0,0) shows px from 0-127
@@ -372,17 +468,13 @@ end
 function _drawCaret(x, y)
   _drawCell(2,x,y)
 end
-
-function _checkButtons(caret, maxx, maxy) 
-  if(finished) then 
-    if (btnp(fire1)) then 
-      setup = false
-      finished = false
-      _init()
-    end 
-    return 
-  end
-
+function checkEndButtons()
+  if (btnp(fire1)) then 
+    _init()
+  end 
+  return 
+end
+function checkGameButtons(caret, maxx, maxy) 
   if (btnp(left) and caret.x > 0) then 
      caret.x -= 1 
   end
