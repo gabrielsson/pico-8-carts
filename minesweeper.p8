@@ -8,13 +8,9 @@ SPRITE_CLOSED, SPRITE_CARET, SPRITE_BOMB, SPRITE_NUMBER, SPRITE_OPEN, SPRITE_FLA
 OPEN,CLOSED = 0,1
 
 board = {}
-board.x = 4
-board.y = 4
-board.cells = {}
+
 numberOfMines = 3
 caret = {}
-caret.x = 0
-caret.y = 0
 zoomFactor = 1
 message = ""
 finished = false
@@ -24,6 +20,12 @@ setup = false
 function _init()
   palt(0, false)
   palt(3, true)  
+  caret.x = 0
+  caret.y = 0
+  board.x = 4
+  board.y = 4
+  board.cells = {}
+  zoomFactor = 1
   for i = 0, board.x - 1 do
     board.cells[i] = {}
     for j = 0, board.y - 1 do
@@ -348,7 +350,14 @@ function _drawCaret(x, y)
 end
 
 function _checkButtons(caret, maxx, maxy) 
-
+  if(finished) then 
+    if (btnp(fire1)) then 
+      setup = false
+      finished = false
+      _init()
+    end 
+    return 
+  end
 
   if (btnp(left) and caret.x > 0) then 
      caret.x -= 1 
