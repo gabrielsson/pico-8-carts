@@ -7,7 +7,7 @@ __lua__
 --vars
 headercolour = 8 --red
 slide = 0
-slidelimit = 6
+slidelimit = 8
 slidecounter = 0
 slidetitle = ""
 stringhasbullet = {}
@@ -101,12 +101,27 @@ function _update()
 end
 
 function _draw()
- cls()
+	if slide == 6 then 
+		draw_demo2()
+		return
+	end
+
+	if slide == 7 then 
+		draw_demo3()
+		return
+	end
+	if slide == 8 then 
+		draw_demo1()
+		return
+	end
+ 	cls()
 	if slide == 0 then
 		draw_squeed()
+	
 	else
 		spr(65,80,96,6,3)
 	end
+
  --draw particles
  --comment out to disable
 	for ps in all(particle_systems) do
@@ -191,6 +206,68 @@ function draw_squeed()
 		--spr(1, 64-4, 90)
 end
 
+function draw_demo1()
+	-- https://twitter.com/guerragames/status/1142841628291477504
+	cls()
+	for j=0,64 do
+	x,y=0,0
+	for i=0,16 do
+	a=i/36+time()+j/8
+	b=i/24+time()+j/13
+	n=64+2*j*(sin(a)-cos(b)/7)
+	m=64+2*j*(cos(a)-sin(b)/7)
+	if(x>0)line(x,y,n,m,7)
+	x,y=n,m
+	end
+	end
+	flip()
+
+end
+
+function draw_demo2() 
+	-- https://twitter.com/lucatron_/status/1111025877402320897
+	cls(8)srand()
+	circfill(64,55,46,9)
+	x=time()*8%150-9
+	y=14+sin(x/8)*2.5
+	line(x,14,x-2,y,2)
+	line(x,14,x+2,y)
+	rectfill(0,50,127,127)
+	for y=0,77 do
+	z=77/(y+1)
+	for i=0,z*8 do
+	x=rnd(160)-16
+	w=sin(rnd()+time())*12/z
+	if(w>0)line(x-w,y+50,x+w,y+50,max(2,pget(x,49-y/2)))
+	end
+	end
+	flip()
+end
+
+function draw_demo3()
+	-- https://twitter.com/lucatron_/status/1081028654619025410 
+	cls(1)
+	srand(34)
+	for y=0,141,3 do
+	 x=rnd(144)-8
+	 h=14+rnd(24)
+	 for i=0,h do
+	  circfill(x-i*2,y+2,(h-i)/6,0)
+	 end
+	 line(x,y,x,y+2,5)
+	 for i=-15,15 do
+	  line(x+i*h/80,y-abs(i)/6,x+sin(time()/5+x/150+y/200)/5*h,y-h,i>0 and 3 or 0)
+	 end
+	end
+	flip()
+end
+function f(i)
+	c={0,1,2,8,14,15,7}
+	fillp(0xa5a5)
+	
+	return c[flr(1.5+abs(6-i%12))]
+end
+
 function _slidechanged()
 
 	--new slide
@@ -198,117 +275,74 @@ function _slidechanged()
  
 	--update slide
 	if slide == 0 then
+		slidetitle = ""
+		slidestrings = {}
+	 	stringhasbullet = {}
+	end
+	if slide == 1 then
 		slidetitle = "max 10 ar"
 		slidestrings = {
-			"mitt forsta 'spel'",
-			"",
-		"echo -n 'vad heter du: ",
-		"read n",
-		"echo 'hej, $n!'"
-	 }
-	 stringhasbullet = {
-	 	0,
-	 	0,
-	 	0,
-	 	0,
-	 	0
-	 }
+				"mitt forsta 'spel'",
+				"",
+			"echo -n 'vad heter du: ",
+			"read n",
+			"echo 'hej, $n!'"
+	 	}
+		stringhasbullet = {
+			0,
+			0,
+			0,
+			0,
+			0
+		}
 	end
-	
-	if slide == 1 then
-		slidetitle = "😐 25 ar senare 😐"
-		slidestrings = {
-	 	"unity"
-	 }
-	 stringhasbullet = {
-	 	1
-	 }	
-	end
-	
+
 	if slide == 2 then
+		slidetitle = "25 ar senare"
+		slidestrings = {
+			"unity",
+			"komplicerat",
+			"stort",
+			"huvudvark"
+		}
+		stringhasbullet = {
+			0,
+			1,
+			1,
+			0,
+		}
+	end
+	
+	if slide == 3 then
 		slidetitle = "Breakthrough: gamesh>"
 		slidestrings = {
-	 	"  pycade (python)",
-		"  love2d, love (lua)",
-		"  pico-8 (lua)"
-	 }
-	 stringhasbullet = {
-	 	1,
-		 1,
-		 1
-	 }
+			"  pycade (python)",
+			"  love2d, love (lua)",
+			"  pico-8 (lua)"
+		}
+		stringhasbullet = {
+			1,
+			1,
+			1
+		}
 	end
 			
-	if slide == 3 then
-		slidetitle = "what can pico slides do?"
-		slidestrings = {
-	 	"  pico slides can also show",
-	 	"  bullets...",
-	 	"just like this",
-	 	"and this",
-	 	"or this!"
-	 }
-	 stringhasbullet = {
-	 	0,
-	 	0,
-	 	1,
-	 	1,
-	 	1
-	 }
+	if slide == 4 then
+		slidetitle = "pico-8"
+		slidestrings = {"konsol", "IDE","musik","grafik"}
+		stringhasbullet = {0,0,0,0}
 	end
 	
 	if slide == 4 then
-		slidetitle = "hints"
-		slidestrings = {
-	 	"the slide counter is in the",
-	 	"  bottom left",
-	 	"you can use a game controller",
-	 	"  to present wirelessly",
-	 	"there's a little dude that",
-	 	"  appears to let you know a",
-	 	"  slide is almost complete",
-	 	"there he is!"
-	 }
-	 stringhasbullet = {
-	 	1,
-	 	0,
-	 	1,
-	 	0,
-	 	1,
-	 	0,
-	 	0,
-	 	1
-	 }
+		slidetitle = "pico-8, scope"
+		slidestrings = {"128px x 128px", "16 farger","lua","128 sprites","32k kasett"}
+		stringhasbullet = {0,0,0,0,0}
 	end
 	
 	if slide == 5 then
-		slidetitle = "extra"
-		slidestrings = {
-	 	"in the _draw() function you",
-	 	"		can watch the slidecounter",
-	 	"  and insert your own code",
-	 	"  to make things prettier",
-	 	"like full screen headings",
-	 	"or even entire games!"
-	 }
-	 stringhasbullet = {
-	 	1,
-	 	0,
-	 	0,
-	 	0,
-	 	1,
-	 	1
-	 }
-	end
-	
-	if slide == 6 then
-		slidetitle = "😐 pico slides 😐"
-		slidestrings = {
-	 	"  have fun ♥",
-	 }
-	 stringhasbullet = {
-	 	0
-	 }	
+		slidetitle = "pico-8, demo scene"
+		slidestrings = {"","",""}
+		stringhasbullet = {0,0,0}
 	end
 	
 	--bullets
