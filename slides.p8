@@ -201,7 +201,7 @@ function draw_squeed()
 	print("pico-8 " ,
 		  58, 70, 14) --8+(t/4)%8)
 
-	print("en virtuell konsol",
+	print("a fantasy console",
 		  34, 80, 12) --8+(t/4)%8)
 	t += 1
 	if t > 50 then t = 0 end
@@ -283,24 +283,24 @@ function _slidechanged()
 	 	stringhasbullet = {}
 	end
 	if slide == 1 then
-		slidetitle = "max 10 ar"
+		slidetitle = "max 10 years old"
 		slidestrings = {
-				"mitt forsta 'spel'",
+				"my first 'game'",
 				"     st BASIC",
-			"echo -n 'vAD HETER DU: ",
+			"echo -n 'wHATS YOUR NAME: ",
 			"read n",
-			"echo 'hEJ, $n!'"
+			"echo 'hELLO, $n!'"
 	 	}
 		stringhasbullet = {0,1,0,0,0}
 	end
 
 	if slide == 2 then
-		slidetitle = "25 ar senare"
+		slidetitle = "25 years later"
 		slidestrings = {
 			"  uNITY",
-			"  kOMPLICERAT",
-			"  sTORT",
-			"  hUVUDVARK :("
+			"  cOMPLEX",
+			"  hUGE",
+			"  hEADACHE :("
 		}
 		stringhasbullet = {0,1,1,1}
 	end
@@ -318,13 +318,13 @@ function _slidechanged()
 	if slide == 4 then
 		slidetitle = "pico-8"
 		slidestrings = {
-			"  kONSOL", 
+			"  cONSOLE", 
 			"  ide",
-			"  mUSIK",
-			"  gRAFIK",
-			"  dOKUMENTATION",
+			"  mUSIC",
+			"  gRAFICS",
+			"  dOCUMENTATION",
 			"  cOMMUNITY",
-			"  mULTIPLATFORM"
+			"  mULTI PLATFORM"
 		}
 		stringhasbullet = {1,1,1,1,1,1,1}
 	end
@@ -334,9 +334,9 @@ function _slidechanged()
 		slidestrings = {
 			"  lUA",
 			"  128PX x 128PX", 
-			"  16 farger",
+			"  16 colors",
 			"  128 sprites",
-			"  32K spel"
+			"  32K game size"
 		}
 		stringhasbullet = {1,1,1,1,1}
 	end
@@ -350,7 +350,7 @@ function _slidechanged()
 	if slide == 10 then
 		music(0)
 		slidetitle = "pico-8, music"
-		slidestrings = {"4 channels", "8 vågformer", "8 effekter"}
+		slidestrings = {"4 channels", "8 waveforms", "8 effects"}
 		stringhasbullet = {1,1,1}
 	end
 	
